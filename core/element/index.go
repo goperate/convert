@@ -1,4 +1,4 @@
-package elemen
+package element
 
 import (
 	"errors"

@@ -3,7 +3,7 @@ package dict
 import (
 	"errors"
 	"fmt"
-	"github.com/goperate/convert/core/elemen"
+	"github.com/goperate/convert/core/element"
 	"reflect"
 )
 
@@ -167,6 +167,6 @@ func (t *Dict) Get(key interface{}, args ...interface{}) interface{} {
 	return out.Interface()
 }
 
-func (t *Dict) GetElement(key interface{}, args ...interface{}) *elemen.Element {
-	return elemen.NewElement(t.Get(key, args...))
+func (t *Dict) GetElement(key interface{}, args ...interface{}) *element.Element {
+	return element.NewElement(t.Get(key, args...))
 }

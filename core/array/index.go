@@ -1,7 +1,7 @@
 package array
 
 import (
-	"github.com/goperate/convert/core/elemen"
+	"github.com/goperate/convert/core/element"
 )
 
 type Array struct {
@@ -71,7 +71,7 @@ func (t *Array) base(f func(v interface{})) {
 func (t *Array) ToIntArray() (res []int) {
 	m := make(map[int]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToInt()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -89,7 +89,7 @@ func (t *Array) ToIntArray() (res []int) {
 func (t *Array) ToInt32Array() (res []int32) {
 	m := make(map[int32]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToInt32()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -107,7 +107,7 @@ func (t *Array) ToInt32Array() (res []int32) {
 func (t *Array) ToInt64Array() (res []int64) {
 	m := make(map[int64]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToInt64()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -125,7 +125,7 @@ func (t *Array) ToInt64Array() (res []int64) {
 func (t *Array) ToUintArray() (res []uint) {
 	m := make(map[uint]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToUint()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -143,7 +143,7 @@ func (t *Array) ToUintArray() (res []uint) {
 func (t *Array) ToUint32Array() (res []uint32) {
 	m := make(map[uint32]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToUint32()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -161,7 +161,7 @@ func (t *Array) ToUint32Array() (res []uint32) {
 func (t *Array) ToUint64Array() (res []uint64) {
 	m := make(map[uint64]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToUint64()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -179,7 +179,7 @@ func (t *Array) ToUint64Array() (res []uint64) {
 func (t *Array) ToFloat32Array() (res []float32) {
 	m := make(map[float32]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToFloat32()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -197,7 +197,7 @@ func (t *Array) ToFloat32Array() (res []float32) {
 func (t *Array) ToFloat64Array() (res []float64) {
 	m := make(map[float64]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToFloat64()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
@@ -215,7 +215,7 @@ func (t *Array) ToFloat64Array() (res []float64) {
 func (t *Array) ToStringArray() (res []string) {
 	m := make(map[string]int)
 	f := func(v interface{}) {
-		any := elemen.NewElement(v)
+		any := element.NewElement(v)
 		vv := any.ToString()
 		if !t.deduplication || m[vv] == 0 {
 			res = append(res, vv)
