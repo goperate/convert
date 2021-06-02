@@ -65,6 +65,8 @@ func (t *Array) base(f func(v interface{})) {
 		for _, v := range t.Data.([]interface{}) {
 			f(v)
 		}
+	default:
+		panic("不支持的数据类型")
 	}
 }
 

@@ -1,11 +1,10 @@
-package dict
+package array
 
 import (
-	"fmt"
 	"reflect"
 )
 
-func StructList2Map(data interface{}, keyName interface{}) interface{} {
+func ToIdMap(data interface{}, keyName interface{}) interface{} {
 	value := reflect.ValueOf(data)
 	typ := value.Type()
 	keyNameValue := reflect.ValueOf(keyName)
@@ -34,8 +33,6 @@ func StructList2Map(data interface{}, keyName interface{}) interface{} {
 	default:
 		panic("elem is not struct or map")
 	}
-	fmt.Println(elemType2)
-
 	resValue := reflect.MakeMap(reflect.MapOf(keyType, elemType))
 	for i := 0; i < value.Len(); i++ {
 		v := value.Index(i)
