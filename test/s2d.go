@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/goperate/convert/core/array"
 )
@@ -14,34 +13,46 @@ type A struct {
 
 func test1() {
 	data := []*map[string]int{{
-		"Id": 122,
+		"id": 122,
 	}}
-	res := array.ToIdMap(data, "Id").(map[int]*map[string]int)
-	b, err := json.Marshal(res)
-	fmt.Println(res, "\n", string(b), err)
+	arr := array.NewObjArray(data, "id")
+	res := arr.ToIdMap().(map[int]*map[string]int)
+	fmt.Println(res)
+	res2 := arr.ToIdMapArray().(map[int][]*map[string]int)
+	fmt.Println(res2)
+	fmt.Println()
 }
 
 func test2() {
 	data := []map[int]float32{{
 		22: 122,
 	}}
-	res := array.ToIdMap(data, 22).(map[float32]map[int]float32)
-	b, err := json.Marshal(res)
-	fmt.Println(res, "\n", string(b), err)
+	arr := array.NewObjArray(data, 22)
+	res := arr.ToIdMap().(map[float32]map[int]float32)
+	fmt.Println(res)
+	res2 := arr.ToIdMapArray().(map[float32][]map[int]float32)
+	fmt.Println(res2)
+	fmt.Println()
 }
 
 func test3() {
 	data := []*A{{1, 2, "a"}, {2, 3, "b"}}
-	res := array.ToIdMap(data, "Id").(map[int]*A)
-	b, err := json.Marshal(res)
-	fmt.Println(res, "\n", string(b), err)
+	arr := array.NewObjArray(data, "Id")
+	res := arr.ToIdMap().(map[int]*A)
+	fmt.Println(res)
+	res2 := arr.ToIdMapArray().(map[int][]*A)
+	fmt.Println(res2)
+	fmt.Println()
 }
 
 func test4() {
-	data := []A{{1, 2, "a"}, {2, 3, "b"}}
-	res := array.ToIdMap(data, "Id2").(map[uint]A)
-	b, err := json.Marshal(res)
-	fmt.Println(res, "\n", string(b), err)
+	data := []A{{1, 2, "a"}, {2, 3, "b"}, {3, 2, "aa"}}
+	arr := array.NewObjArray(data, "Id2")
+	res := arr.ToIdMap().(map[uint]A)
+	fmt.Println(res)
+	res2 := arr.ToIdMapArray().(map[uint][]A)
+	fmt.Println(res2)
+	fmt.Println()
 }
 
 func main() {

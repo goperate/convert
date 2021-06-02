@@ -4,49 +4,76 @@ import (
 	"reflect"
 )
 
-func ToIdMap(data interface{}, keyName interface{}) interface{} {
-	value := reflect.ValueOf(data)
-	typ := value.Type()
-	keyNameValue := reflect.ValueOf(keyName)
-	if value.Kind() != reflect.Slice {
+type ObjArray struct {
+	value        reflect.Value
+	typ          reflect.Type
+	keyNameValue reflect.Value
+	keyType      reflect.Type
+	elemType     reflect.Type
+	isPtr        bool
+	isMap        bool
+}
+
+func NewObjArray(data interface{}, keyName interface{}) (res *ObjArray) {
+	res = new(ObjArray)
+	res.value = reflect.ValueOf(data)
+	res.typ = res.value.Type()
+	res.keyNameValue = reflect.ValueOf(keyName)
+	if res.value.Kind() != reflect.Slice {
 		panic("data is not array")
 	}
-	elemType := typ.Elem()
-	elemType2 := elemType
-	isPtr := false
+	res.elemType = res.typ.Elem()
+	elemType2 := res.elemType
 	if elemType2.Kind() == reflect.Ptr {
-		isPtr = true
+		res.isPtr = true
 		elemType2 = elemType2.Elem()
 	}
-	var keyType reflect.Type
-	isMap := false
 	switch elemType2.Kind() {
 	case reflect.Struct:
-		key, ok := elemType2.FieldByName(keyNameValue.String())
+		key, ok := elemType2.FieldByName(res.keyNameValue.String())
 		if !ok {
-			panic(keyNameValue.String() + " is not in struct field")
+			panic(res.keyNameValue.String() + " is not in struct field")
 		}
-		keyType = key.Type
+		res.keyType = key.Type
 	case reflect.Map:
-		isMap = true
-		keyType = elemType2.Elem()
+		res.isMap = true
+		res.keyType = elemType2.Elem()
 	default:
 		panic("elem is not struct or map")
 	}
-	resValue := reflect.MakeMap(reflect.MapOf(keyType, elemType))
-	for i := 0; i < value.Len(); i++ {
-		v := value.Index(i)
-		vv := v
-		if isPtr {
-			vv = v.Elem()
+	return
+}
+
+func (t *ObjArray) elemGetKey(v reflect.Value) (key reflect.Value) {
+	if t.isPtr {
+		v = v.Elem()
+	}
+	if t.isMap {
+		key = v.MapIndex(t.keyNameValue)
+	} else {
+		key = v.FieldByName(t.keyNameValue.String())
+	}
+	return
+}
+
+func (t *ObjArray) ToIdMap() interface{} {
+	resValue := reflect.MakeMap(reflect.MapOf(t.keyType, t.elemType))
+	for i := 0; i < t.value.Len(); i++ {
+		v := t.value.Index(i)
+		resValue.SetMapIndex(t.elemGetKey(v), v)
+	}
+	return resValue.Interface()
+}
+
+func (t *ObjArray) ToIdMapArray() interface{} {
+	resValue := reflect.MakeMap(reflect.MapOf(t.keyType, reflect.SliceOf(t.elemType)))
+	for i := 0; i < t.value.Len(); i++ {
+		v := t.value.Index(i)
+		key := t.elemGetKey(v)
+		if resValue.MapIndex(key).Kind() == reflect.Invalid {
+			resValue.SetMapIndex(key, reflect.MakeSlice(reflect.SliceOf(t.elemType), 0, 0))
 		}
-		var key reflect.Value
-		if isMap {
-			key = vv.MapIndex(keyNameValue)
-		} else {
-			key = vv.FieldByName(keyNameValue.String())
-		}
-		resValue.SetMapIndex(key, v)
+		resValue.SetMapIndex(key, reflect.Append(resValue.MapIndex(key), v))
 	}
 	return resValue.Interface()
 }
