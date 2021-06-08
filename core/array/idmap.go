@@ -10,10 +10,11 @@ type _field struct {
 }
 
 type _return struct {
-	Active   bool
-	Out      reflect.Value
-	IsRun    bool
-	KeyIndex int
+	Active    bool
+	Out       reflect.Value
+	IsRun     bool
+	KeyIndex  int
+	KeyIndex2 int
 }
 
 type ObjArray struct {
@@ -47,7 +48,7 @@ func NewObjArray(data interface{}, keyName interface{}) (res *ObjArray) {
 	return
 }
 
-func (t *ObjArray) getKeyType(name interface{}) {
+func (t *ObjArray) getKeyType(name interface{}) int {
 	t.lenKeys += 1
 	var key _field
 	key.NameValue = reflect.ValueOf(name)
@@ -64,44 +65,76 @@ func (t *ObjArray) getKeyType(name interface{}) {
 		panic("elem is not struct or map")
 	}
 	t.keys = append(t.keys, key)
+	return t.lenKeys - 1
 }
 
 // IdMap 生成{1: struct}
-func (t *ObjArray) IdMap() *ObjArray {
+func (t *ObjArray) IdMap(key ...interface{}) *ObjArray {
+	if len(key) > 0 {
+		t.idMapOne.KeyIndex = t.getKeyType(key[0])
+	}
 	t.idMap.Active = true
-	t.idMap.Out = reflect.MakeMap(reflect.MapOf(t.keys[0].Type, t.elemType))
+	t.idMap.Out = reflect.MakeMap(reflect.MapOf(
+		t.keys[t.idMapOne.KeyIndex].Type,
+		t.elemType,
+	))
 	return t
 }
 
 // IdMapArray 生成{1: [struct]}
-func (t *ObjArray) IdMapArray() *ObjArray {
+func (t *ObjArray) IdMapArray(key ...interface{}) *ObjArray {
+	if len(key) > 0 {
+		t.idMapArray.KeyIndex = t.getKeyType(key[0])
+	}
 	t.idMapArray.Active = true
-	t.idMapArray.Out = reflect.MakeMap(reflect.MapOf(t.keys[0].Type, reflect.SliceOf(t.elemType)))
+	t.idMapArray.Out = reflect.MakeMap(reflect.MapOf(
+		t.keys[t.idMapArray.KeyIndex].Type,
+		reflect.SliceOf(t.elemType),
+	))
 	return t
 }
 
 // IdMapOne 生成{1: 2}
-func (t *ObjArray) IdMapOne(valKey interface{}) *ObjArray {
-	t.getKeyType(valKey)
+func (t *ObjArray) IdMapOne(key interface{}, key2 ...interface{}) *ObjArray {
+	t.getKeyType(key)
+	if len(key2) > 0 {
+		t.idMapOne.KeyIndex = t.lenKeys - 1
+		t.idMapOne.KeyIndex2 = t.getKeyType(key2[0])
+	} else {
+		t.idMapOne.KeyIndex2 = t.lenKeys - 1
+	}
 	t.idMapOne.Active = true
-	t.idMapOne.KeyIndex = t.lenKeys - 1
-	t.idMapOne.Out = reflect.MakeMap(reflect.MapOf(t.keys[0].Type, t.keys[t.idMapOne.KeyIndex].Type))
+	t.idMapOne.Out = reflect.MakeMap(reflect.MapOf(
+		t.keys[t.idMapOne.KeyIndex].Type,
+		t.keys[t.idMapOne.KeyIndex2].Type,
+	))
 	return t
 }
 
 // IdMapOneArray 生成{1: [1, 2]}
-func (t *ObjArray) IdMapOneArray(valKey interface{}) *ObjArray {
-	t.getKeyType(valKey)
+func (t *ObjArray) IdMapOneArray(key interface{}, key2 ...interface{}) *ObjArray {
+	t.getKeyType(key)
+	if len(key2) > 0 {
+		t.idMapOneArray.KeyIndex = t.lenKeys - 1
+		t.idMapOneArray.KeyIndex2 = t.getKeyType(key2[0])
+	} else {
+		t.idMapOneArray.KeyIndex2 = t.lenKeys - 1
+	}
 	t.idMapOneArray.Active = true
-	t.idMapOneArray.KeyIndex = t.lenKeys - 1
-	t.idMapOneArray.Out = reflect.MakeMap(reflect.MapOf(t.keys[0].Type, reflect.SliceOf(t.keys[t.idMapOneArray.KeyIndex].Type)))
+	t.idMapOneArray.Out = reflect.MakeMap(reflect.MapOf(
+		t.keys[t.idMapOneArray.KeyIndex].Type,
+		reflect.SliceOf(t.keys[t.idMapOneArray.KeyIndex2].Type),
+	))
 	return t
 }
 
 // IdArray 生成[1, 2, 3]
-func (t *ObjArray) IdArray() *ObjArray {
+func (t *ObjArray) IdArray(key ...interface{}) *ObjArray {
+	if len(key) > 0 {
+		t.idArray.KeyIndex = t.getKeyType(key[0])
+	}
 	t.idArray.Active = true
-	t.idArray.Out = reflect.MakeSlice(reflect.SliceOf(t.keys[0].Type), 0, 0)
+	t.idArray.Out = reflect.MakeSlice(reflect.SliceOf(t.keys[t.idArray.KeyIndex].Type), 0, 0)
 	return t
 }
 
@@ -120,26 +153,30 @@ func (t *ObjArray) elemGetKey(v reflect.Value, index int) (key reflect.Value) {
 func (t *ObjArray) run() *ObjArray {
 	for i := 0; i < t.value.Len(); i++ {
 		v := t.value.Index(i)
-		key := t.elemGetKey(v, 0)
 		if t.idMap.Active && !t.idMap.IsRun {
+			key := t.elemGetKey(v, t.idMap.KeyIndex)
 			t.idMap.Out.SetMapIndex(key, v)
 		}
 		if t.idMapArray.Active && !t.idMapArray.IsRun {
+			key := t.elemGetKey(v, t.idMapArray.KeyIndex)
 			if t.idMapArray.Out.MapIndex(key).Kind() == reflect.Invalid {
 				t.idMapArray.Out.SetMapIndex(key, reflect.MakeSlice(reflect.SliceOf(t.elemType), 0, 0))
 			}
 			t.idMapArray.Out.SetMapIndex(key, reflect.Append(t.idMapArray.Out.MapIndex(key), v))
 		}
 		if t.idMapOne.Active && !t.idMapOne.IsRun {
-			t.idMapOne.Out.SetMapIndex(key, t.elemGetKey(v, t.idMapOne.KeyIndex))
+			key := t.elemGetKey(v, t.idMapOne.KeyIndex)
+			t.idMapOne.Out.SetMapIndex(key, t.elemGetKey(v, t.idMapOne.KeyIndex2))
 		}
 		if t.idMapOneArray.Active && !t.idMapOneArray.IsRun {
+			key := t.elemGetKey(v, t.idMapOneArray.KeyIndex)
 			if t.idMapOneArray.Out.MapIndex(key).Kind() == reflect.Invalid {
-				t.idMapOneArray.Out.SetMapIndex(key, reflect.MakeSlice(reflect.SliceOf(t.keys[t.idMapOneArray.KeyIndex].Type), 0, 0))
+				t.idMapOneArray.Out.SetMapIndex(key, reflect.MakeSlice(reflect.SliceOf(t.keys[t.idMapOneArray.KeyIndex2].Type), 0, 0))
 			}
-			t.idMapOneArray.Out.SetMapIndex(key, reflect.Append(t.idMapOneArray.Out.MapIndex(key), t.elemGetKey(v, t.idMapOneArray.KeyIndex)))
+			t.idMapOneArray.Out.SetMapIndex(key, reflect.Append(t.idMapOneArray.Out.MapIndex(key), t.elemGetKey(v, t.idMapOneArray.KeyIndex2)))
 		}
 		if t.idArray.Active && !t.idArray.IsRun {
+			key := t.elemGetKey(v, t.idArray.KeyIndex)
 			t.idArray.Out = reflect.Append(t.idArray.Out, key)
 		}
 	}
