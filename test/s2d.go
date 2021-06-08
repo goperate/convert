@@ -17,8 +17,8 @@ func test1() {
 		"id2": 13,
 	}}
 	arr := array.NewObjArray(data, "id").
-		IdMap().IdMapArray().
-		IdMapOne("id2").
+		IdMap("id2").IdMapArray("id").
+		IdMapOne("id", "id2").
 		IdMapOneArray("id2", "id").
 		IdArray("id2")
 	res := arr.ToIdMap().(map[int]*map[string]int)

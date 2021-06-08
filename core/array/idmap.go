@@ -71,11 +71,11 @@ func (t *ObjArray) getKeyType(name interface{}) int {
 // IdMap 生成{1: struct}
 func (t *ObjArray) IdMap(key ...interface{}) *ObjArray {
 	if len(key) > 0 {
-		t.idMapOne.KeyIndex = t.getKeyType(key[0])
+		t.idMap.KeyIndex = t.getKeyType(key[0])
 	}
 	t.idMap.Active = true
 	t.idMap.Out = reflect.MakeMap(reflect.MapOf(
-		t.keys[t.idMapOne.KeyIndex].Type,
+		t.keys[t.idMap.KeyIndex].Type,
 		t.elemType,
 	))
 	return t
