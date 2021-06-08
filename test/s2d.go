@@ -19,14 +19,14 @@ func test1() {
 	arr := array.NewObjArray(data, "id").
 		IdMap("id2").IdMapArray("id").
 		IdMapOne("id", "id2").
-		IdMapOneArray("id2", "id").
+		//IdMapOneArray("id2", "id").
 		IdArray("id2")
 	res := arr.ToIdMap().(map[int]*map[string]int)
 	fmt.Println(res)
 	res2 := arr.ToIdMapArray().(map[int][]*map[string]int)
 	fmt.Println(res2)
 	fmt.Println(arr.ToIdMapOne())
-	fmt.Println(arr.ToIdMapOneArray())
+	fmt.Println(arr.ToIdMapOneArray("id2", "id"))
 	fmt.Println(arr.ToIdArray())
 	fmt.Println()
 }

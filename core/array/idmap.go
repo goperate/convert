@@ -210,7 +210,7 @@ func (t *ObjArray) ToIdMapArray() interface{} {
 
 func (t *ObjArray) ToIdMapOne(key ...interface{}) interface{} {
 	if !t.idMapOne.Active {
-		t.IdMapOne(key[0])
+		t.IdMapOne(key[0], key[1:]...)
 	}
 	if !t.idMapOne.IsRun {
 		t.run()
@@ -220,7 +220,7 @@ func (t *ObjArray) ToIdMapOne(key ...interface{}) interface{} {
 
 func (t *ObjArray) ToIdMapOneArray(key ...interface{}) interface{} {
 	if !t.idMapOneArray.Active {
-		t.IdMapOneArray(key[0])
+		t.IdMapOneArray(key[0], key[1:]...)
 	}
 	if !t.idMapOneArray.IsRun {
 		t.run()
