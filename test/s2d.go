@@ -58,6 +58,9 @@ func test3() {
 	fmt.Println(arr.ToIdMapOneArray())
 	fmt.Println(arr.ToIdArray())
 	fmt.Println()
+
+	var data2 []*A
+	fmt.Println(array.NewObjArray(data2, "Id").ToIdArray().([]int))
 }
 
 func test4() {
