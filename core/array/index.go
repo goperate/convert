@@ -2,6 +2,7 @@ package array
 
 import (
 	"github.com/goperate/convert/core/element"
+	"reflect"
 )
 
 type Array struct {
@@ -9,11 +10,18 @@ type Array struct {
 	Error         error
 	deduplication bool
 	dict          interface{}
+	value         reflect.Value
 }
 
-func NewArray(val interface{}) *Array {
+func NewArray(val interface{}, ded ...bool) *Array {
+	value := reflect.ValueOf(val)
+	if value.Kind() != reflect.Slice {
+		return nil
+	}
 	return &Array{
-		Data: val,
+		Data:          val,
+		value:         value,
+		deduplication: len(ded) > 0 && ded[0],
 	}
 }
 
@@ -23,50 +31,8 @@ func (t *Array) Deduplication(v bool) *Array {
 }
 
 func (t *Array) base(f func(v interface{})) {
-	switch t.Data.(type) {
-	case []int:
-		for _, v := range t.Data.([]int) {
-			f(v)
-		}
-	case []int32:
-		for _, v := range t.Data.([]int32) {
-			f(v)
-
-		}
-	case []int64:
-		for _, v := range t.Data.([]int64) {
-			f(v)
-		}
-	case []uint:
-		for _, v := range t.Data.([]uint) {
-			f(v)
-		}
-	case []uint32:
-		for _, v := range t.Data.([]uint32) {
-			f(v)
-		}
-	case []uint64:
-		for _, v := range t.Data.([]uint64) {
-			f(v)
-		}
-	case []float32:
-		for _, v := range t.Data.([]float32) {
-			f(v)
-		}
-	case []float64:
-		for _, v := range t.Data.([]float64) {
-			f(v)
-		}
-	case []string:
-		for _, v := range t.Data.([]string) {
-			f(v)
-		}
-	case []interface{}:
-		for _, v := range t.Data.([]interface{}) {
-			f(v)
-		}
-	default:
-		panic("不支持的数据类型")
+	for i := 0; i < t.value.Len(); i++ {
+		f(t.value.Index(i).Interface())
 	}
 }
 

@@ -71,5 +71,5 @@ func if_() {
 }
 
 func main() {
-	if_()
+	default_()
 }

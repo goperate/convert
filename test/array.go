@@ -11,4 +11,5 @@ func main() {
 	fmt.Println(arr.ToFloat32Map()) //返回每个值出现的数量
 	arr.Deduplication(true)         //支持对返回结果进行去重
 	fmt.Println(arr.ToIntArray())
+	fmt.Println(arr.ToInterfaceArray())
 }
